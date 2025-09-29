@@ -22,7 +22,7 @@
  
 )
 
-= #strong[Prakata: Rekayasa sebagai Tindakan Penciptaan Dunia]
+== #strong[Prakata: Rekayasa sebagai Tindakan Penciptaan Dunia]
 <prakata-rekayasa-sebagai-tindakan-penciptaan-dunia>
 Selamat datang, para insinyur, peneliti, dan arsitek masa depan. Kita
 berada di garis depan sebuah era yang ditandai oleh tantangan-tantangan
@@ -61,7 +61,7 @@ menyinergikan kecerdasan manusia, kecerdasan buatan, dan kecerdasan alam
 untuk menciptakan solusi yang benar-benar cerdas, berkelanjutan, dan
 manusiawi.1
 
-#strong[Bagian I: Fondasi Paradigma TISE]
+= #strong[Bagian I: Fondasi Paradigma TISE]
 
 Bagian ini akan meletakkan dasar-dasar konseptual dari paradigma TISE.
 Kita akan membedah "organ-organ" internal dari sebuah artefak cerdas dan
