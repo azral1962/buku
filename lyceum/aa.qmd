@@ -1,0 +1,42 @@
+Arsitektur *Enterprise* (EA) dan manajemen proyek bekerja sama untuk menyelaraskan inisiatif teknologi dengan tujuan bisnis melalui serangkaian tahapan perencanaan, identifikasi kebutuhan, penentuan prioritas, dan eksekusi yang terstruktur.
+
+Berikut adalah penjelasan komprehensif mengenai bagaimana penyelarasan ini dilakukan berdasarkan sumber:
+
+### 1. Peran Arsitektur *Enterprise* dalam Penyelarasan Tujuan
+
+EA berfungsi sebagai kerangka kerja untuk mengarahkan inisiatif teknologi agar sesuai dengan sasaran strategis perusahaan.
+
+-   **Menetapkan Arah Bisnis dan Teknologi (Baseline ke Target):** Semua inisiatif harus dieksekusi sebagai bagian dari perpindahan dari arsitektur saat ini (*baseline*) menuju arsitektur masa depan (*target*) yang lebih baik. Arsitektur masa depan ini harus disesuaikan dengan **tujuan ke mana *enterprise* ini mau bergerak**.
+-   ***High Level*** **dan Acuan Implementasi:** EA bekerja pada tingkat yang tinggi (*High Level*), yaitu memberikan arah. Dengan adanya arah yang jelas dari EA, ketika implementasi detail dilakukan, semua pihak memiliki acuan yang sama sehingga semua bergerak ke arah yang sama.
+-   **Identifikasi Kesenjangan (*Gap*):** Proses EA melibatkan representasi yang serupa antara *baseline* dan *target* untuk memudahkan identifikasi **kesenjangan (*gap*)** atau perbedaan. Kesenjangan inilah yang harus diidentifikasi untuk mendapatkan program-program atau inisiatif yang harus dilakukan.
+-   **Inisiatif sebagai Perubahan:** Esensi dari program atau inisiatif adalah melakukan perubahan untuk mengimplementasikan perpindahan dari *baseline* menuju *target*. Program atau inisiatif ini kemudian dipecah menjadi *Project*.
+
+### 2. Peran Manajemen Proyek dan *Roadmap* dalam Eksekusi
+
+Setelah inisiatif (program/proyek) diidentifikasi, manajemen proyek (terutama melalui *roadmap*) bertugas memastikan inisiatif tersebut dieksekusi tepat waktu dan sesuai dengan prioritas bisnis.
+
+#### Penentuan Waktu dan Prioritas dalam *Roadmap*
+
+-   **Roadmap Sebagai Alat Penempatan Waktu:** Daftar program atau *project* dituangkan ke dalam *roadmap* (pemetaan ke waktu) untuk menetapkan **kapan** proyek tersebut akan dijalankan, termasuk tahun dan bulan keberapa.
+-   **Prioritas Bisnis Sebagai Patokan Utama:** Pertimbangan pertama dalam menentukan kapan proyek sebaiknya dieksekusi adalah **kebutuhan bisnis** (bisnis mintanya kapan). Proyek harus disesuaikan jika, misalnya, bisnis menargetkan tahun 2024 sudah harus menjalankan operasional baru dibantu aplikasi tertentu.
+-   **Kompromi Sumber Daya:** Walaupun kepentingan bisnis diutamakan, inisiatif tidak harus selalu segera dituruti. Pihak teknologi (IT) harus mengajak kompromi karena keterbatasan sumber daya, anggaran (*budget*), dan orang. Kompromi dicari untuk meratakan distribusi proyek, sambil tetap memperhatikan hal-hal yang tidak bisa ditawar (misalnya, keputusan rapat direksi atau kepentingan yang mendesak).
+-   **Teknik Prioritas:** Untuk inisiatif yang fleksibel, teknik prioritas digunakan (seperti grafik *Risk* dan *Value*) untuk menentukan mana yang harus diutamakan. Prioritas tertinggi diberikan kepada proyek yang **risikonya rendah (*low risk*) tetapi memiliki nilai (*value*) yang tinggi**.
+-   **Dependensi:** Faktor penting lainnya adalah dependensi. Sebuah inisiatif mungkin terlihat tidak memiliki nilai besar, tetapi ia bisa menjadi **kunci penyelesaian** inisiatif-inisiatif lain (seperti penataan akses atau platform *open*) sehingga harus diutamakan.
+
+#### Memastikan Dampak Bisnis (*Business Impact*)
+
+Manajemen proyek tidak hanya berfokus pada hasil kerja (*deliverable*), tetapi juga pada dampak bisnis yang dihasilkan.
+
+-   ***Deliverable*** **vs. *Business Impact*:** Setiap proyek harus mendefinisikan *deliverable* (misalnya, aplikasi yang teruji). Namun, tercapainya *deliverable* **tidak menjamin** keuntungan bagi bisnis.
+-   **Integrasi ke dalam Dokumen EA:** Untuk mencegah terabaikannya dampak bisnis, disarankan agar dokumen EA yang berisi daftar inisiatif juga menyertakan **deskripsi dampak (*impact*) yang diharapkan**. Dampak ini bisa berupa penghematan waktu, percepatan layanan, atau efisiensi.
+-   **Mencapai *Impact*:** Adanya kolom dampak ini memaksa perusahaan untuk memikirkan mekanisme agar dampak bisnis benar-benar tercapai, misalnya melalui pelatihan operator atau memastikan dukungan dari pimpinan bisnis unit agar mereka mau mengubah kebiasaan kerja lama.
+
+### 3. Peran *Project Management Office* (PMO)
+
+Setelah *roadmap* dihasilkan oleh tim EA, eksekusinya dikelola secara keseluruhan oleh *Project Management Office* (PMO).
+
+-   **Pengelolaan Seluruh Proyek:** PMO adalah unit organisasi permanen yang bertugas mengelola **kumpulan seluruh proyek** (*Collection of Project or programs*) di perusahaan, termasuk proyek yang berasal dari EA maupun proyek non-EA lainnya (misalnya, perpindahan kantor atau penataan ruangan).
+-   **Koordinasi dan Sumber Daya:** PMO memiliki catatan semua proyek dan bertanggung jawab untuk melihat gambaran besar (portofolio), memastikan tidak ada proyek yang terhambat karena dependensi proyek lain yang belum selesai. PMO juga mengelola sumber daya dan menentukan *Project Manager* yang tepat berdasarkan pengalaman dan pengetahuan manajemen proyek yang dimiliki.
+-   **Kerangka Kerja Pelaksanaan:** PMO memastikan adanya *Framework* manajemen proyek dan mencatat keberhasilan atau kegagalan setiap *Project Manager*.
+
+Dengan demikian, EA menyediakan **arah strategis** yang didasarkan pada tujuan bisnis, sementara manajemen proyek (melalui *roadmap* dan PMO) menyediakan **mekanisme eksekusi** yang sistematis dan terprioritas untuk mewujudkan perubahan tersebut menjadi dampak bisnis nyata.
