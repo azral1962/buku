@@ -1,0 +1,259 @@
+---
+title: "Slides: LCCDE — Linear Constant-Coefficient Differential Equations"
+subtitle: "EL2007 Signals & Systems (CT-LTI)"
+author: "Armein Z. R. Langi — ITB"
+lang: id
+format:
+  revealjs:
+    slide-number: true
+    toc: true
+    toc-depth: 2
+    code-fold: show
+    incremental: true
+    link-external-icon: true
+    footer: "EL2007 — LCCDE"
+jupyter: python3
+---
+
+## Tujuan Sesi
+
+- Memahami apa itu **LCCDE** untuk memodelkan sistem **LTI kontinyu**.  
+- Menulis model dari fisika sederhana (RC, RLC) dan menurunkannya menjadi **fungsi alih** $H(s)$.  
+- Menggunakan **SymPy** untuk $h(t)$, respon step, dan analisis pole/zero & stabilitas.  
+- Memperluas ke **orde lebih tinggi** & **kaskade**.
+
+---
+
+## LCCDE Umum → Fungsi Alih
+
+Model orde-$N$:
+$$
+\sum_{k=0}^{N} a_k rac{\mathrm{d}^k y(t)}{\mathrm{d}t^k}
+= \sum_{m=0}^{M} b_m rac{\mathrm{d}^m x(t)}{\mathrm{d}t^m}.
+$$
+
+Dengan syarat awal nol (ZIC), di Laplace:
+$$
+H(s) \equiv rac{Y(s)}{X(s)} =
+rac{\sum_{m=0}^{M} b_m s^m}{\sum_{k=0}^{N} a_k s^k}.
+$$
+
+::: incremental
+- $a_0$ untuk $y(t)$, $a_1$ untuk $y'(t)$, dst.  
+- $b_0$ untuk $x(t)$, $b_1$ untuk $x'(t)$, dst.
+:::
+
+---
+
+## Setup Python (SymPy)
+
+```{python}
+import sympy as sp
+sp.init_printing(use_unicode=True)
+
+t, s = sp.symbols('t s', positive=True, real=True)
+
+def H_of_s(a_coeffs, b_coeffs):
+    A = sp.Add(*[a_coeffs[k]*s**k for k in range(len(a_coeffs))])
+    B = sp.Add(*[b_coeffs[m]*s**m for m in range(len(b_coeffs))])
+    return sp.simplify(B/A)
+
+def impulse_response_from_coeffs(a_coeffs, b_coeffs):
+    Hs = H_of_s(a_coeffs, b_coeffs)
+    h = sp.inverse_laplace_transform(Hs, s, t)
+    return sp.simplify(h)
+
+def step_response_from_coeffs(a_coeffs, b_coeffs):
+    Hs = H_of_s(a_coeffs, b_coeffs)
+    Xs = 1/s  # Laplace dari u(t)
+    Ys = sp.simplify(Hs*Xs)
+    y_step = sp.inverse_laplace_transform(Ys, s, t)
+    return sp.simplify(y_step)
+```
+
+---
+
+## Orde-1: RC Low-Pass
+
+RC (normalisasi):
+$$
+	au\,rac{\mathrm{d}y}{\mathrm{d}t} + y = x, \quad 	au=RC
+\;\Rightarrow\;
+H(s)=rac{1}{1+	au s}.
+$$
+
+```{python}
+tau = sp.symbols('tau', positive=True, real=True)
+a1 = [1, tau]   # a0 + a1 s
+b1 = [1]
+Hs1 = H_of_s(a1, b1); Hs1
+```
+
+**Respon impuls** $h(t)$ dan **respon step**:
+```{python}
+h1 = impulse_response_from_coeffs(a1, b1)
+y1_step = step_response_from_coeffs(a1, b1)
+h1, sp.simplify(y1_step)
+```
+
+---
+
+## Plot Step Orde-1 (Numerik)
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+tau_val = 0.5
+tt = np.linspace(0, 3, 400)
+y_step_num = 1 - np.exp(-tt/tau_val)
+
+plt.figure()
+plt.plot(tt, y_step_num, label="RC step (τ=0.5)")
+plt.xlabel("t (s)"); plt.ylabel("y(t)")
+plt.title("Respon Tangga RC Orde-1")
+plt.grid(True); plt.legend(); plt.show()
+```
+
+---
+
+## Orde-2 Kanonik (Massa–Pegas–Redaman / RLC)
+
+$$
+rac{\mathrm{d}^2 y}{\mathrm{d}t^2} + 2\zeta\omega_n rac{\mathrm{d}y}{\mathrm{d}t} + \omega_n^2 y
+= \omega_n^2 x(t).
+$$
+
+$$
+H(s)=rac{\omega_n^2}{s^2 + 2\zeta \omega_n s + \omega_n^2}.
+$$
+
+```{python}
+zeta, wn = sp.symbols('zeta wn', positive=True, real=True)
+a2 = [wn**2, 2*zeta*wn, 1]
+b2 = [wn**2]
+Hs2 = H_of_s(a2, b2); Hs2
+```
+
+**ILT** (impuls & step):
+```{python}
+h2 = impulse_response_from_coeffs(a2, b2)
+y2_step = step_response_from_coeffs(a2, b2)
+h2, sp.simplify(y2_step)
+```
+
+---
+
+## Plot Step Orde-2 (Underdamped)
+
+Gunakan rumus eksplisit underdamped ($0<\zeta<1$):
+$$
+y(t) = 1 - rac{e^{-\zeta\omega_n t}}{\sqrt{1-\zeta^2}}
+\sin\!ig(\omega_d t + \phiig),\quad
+\omega_d=\omega_n\sqrt{1-\zeta^2},\;
+\phi=rctan\!rac{\sqrt{1-\zeta^2}}{\zeta}.
+$$
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+zeta_val = 0.2
+wn_val = 5.0
+wd = wn_val*np.sqrt(1 - zeta_val**2)
+phi = np.arctan(np.sqrt(1 - zeta_val**2)/zeta_val)
+
+tt = np.linspace(0, 3, 600)
+yt = 1 - np.exp(-zeta_val*wn_val*tt)/np.sqrt(1 - zeta_val**2) * np.sin(wd*tt + phi)
+
+plt.figure()
+plt.plot(tt, yt, label=f"Step Orde-2 (ζ={zeta_val}, ωn={wn_val})")
+plt.xlabel("t (s)"); plt.ylabel("y(t)")
+plt.title("Respon Tangga Orde-2 (Underdamped)")
+plt.grid(True); plt.legend(); plt.show()
+```
+
+---
+
+## Orde Lebih Tinggi & Stabilitas
+
+- **Stabilitas BIBO**: semua pole penyebut $A(s)$ di LHP (Re$\{s\}<0$).  
+- **Kausalitas**: derajat penyebut $\ge$ derajat pembilang.  
+- **Minimum-phase**: zero di LHP.
+
+```{python}
+# contoh orde-3
+s = sp.symbols('s')
+A3 = sp.expand((s+1)*(s+2)*(s+3))
+a3 = sp.Poly(A3, s).all_coeffs()[::-1]  # [a0,a1,a2,a3]
+b3 = [1, 0.5, 0.1]
+Hs3 = H_of_s(a3, b3); Hs3
+den_roots = sp.nroots(sp.Add(*[a3[k]*s**k for k in range(len(a3))])); den_roots
+```
+
+---
+
+## Kaskade (Seri) Sistem LCCDE
+
+Jika dikaskade: $H_{eq}(s)=H_1(s)H_2(s)$, dan $h_{eq}(t)=h_1*h_2$.
+
+Contoh dua RC:
+$$
+H_1(s)=rac{1}{1+	au_1 s},\quad
+H_2(s)=rac{1}{1+	au_2 s}\Rightarrow
+H_{eq}(s)=rac{1}{(1+	au_1 s)(1+	au_2 s)}.
+$$
+
+```{python}
+tau1, tau2 = sp.symbols('tau1 tau2', positive=True, real=True)
+H1 = 1/(1 + tau1*s); H2 = 1/(1 + tau2*s)
+Heq = sp.simplify(H1*H2)
+h_eq = sp.inverse_laplace_transform(Heq, s, t)
+Heq, h_eq
+```
+
+---
+
+## Plot: RC Tunggal vs Kaskade (2×RC)
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+tau = 0.5
+tt = np.linspace(0, 3, 600)
+y_single = 1 - np.exp(-tt/tau)
+
+tau1 = 0.5; tau2 = 0.8
+# step response dua RC berbeda (konvolusi dua eksponensial → bentuk analitik)
+# y_eq(t) = 1 - (tau2*e^{-t/tau1} - tau1*e^{-t/tau2})/(tau2 - tau1)
+y_cascade = 1 - (tau2*np.exp(-tt/tau1) - tau1*np.exp(-tt/tau2))/(tau2 - tau1)
+
+plt.figure()
+plt.plot(tt, y_single, label="RC tunggal (τ=0.5)")
+plt.xlabel("t (s)"); plt.ylabel("y(t)")
+plt.title("Respon Tangga: RC Tunggal")
+plt.grid(True); plt.legend(); plt.show()
+
+plt.figure()
+plt.plot(tt, y_cascade, label="Kaskade 2×RC (τ1=0.5, τ2=0.8)")
+plt.xlabel("t (s)"); plt.ylabel("y(t)")
+plt.title("Respon Tangga: Kaskade Dua RC")
+plt.grid(True); plt.legend(); plt.show()
+```
+
+---
+
+## Latihan
+
+1. Sistem $2y'(t)+4y(t)=3x(t)$. Turunkan $H(s)$ dan $h(t)$.  
+2. Sistem $y''+6y'+9y=9x$. Hitung $H(s)$, pole, $h(t)$, dan cek stabilitas BIBO.  
+3. Kaskade tiga RC identik ($	au$). Tulis $H(s)$ dan prediksi bentuk step dibanding satu RC.
+
+---
+
+## Ringkasan
+
+- **LCCDE** memodelkan CT-LTI dengan koefisien konstan.  
+- **SymPy** mempermudah aljabar $H(s)$, ILT untuk $h(t)$/$y_{step}(t)$, dan analisis pole/zero.  
+- **Higher-order & kaskade** → polinom $s$ bertambah / dikalikan; periksa stabilitas & kausalitas.

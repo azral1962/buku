@@ -1,0 +1,347 @@
+---
+title: "Catatan Kuliah: LCCDE (Linear Constant-Coefficient Differential Equations)"
+author: "EL2007 Signals & Systems — Armein Z. R. Langi (ITB)"
+lang: id
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: show
+    df-print: paged
+  pdf:
+    documentclass: scrartcl
+    toc: true
+    number-sections: true
+jupyter: python3
+---
+
+# Tujuan Pembelajaran
+
+- Memahami apa itu **LCCDE**: persamaan diferensial linear dengan koefisien konstan untuk memodelkan **sistem LTI kontinyu**.  
+- Mampu menuliskan model LCCDE dari rangkaian/fisika sederhana (RC, RLC), dan menurunkannya ke **fungsi alih** $H(s)$.  
+- Menggunakan **SymPy** untuk menyelesaikan respon **zero-input** dan **zero-state**, **impulse response** $h(t)$, **step response**, serta menganalisis **stabilitas**.  
+- Memahami perluasan ke **orde lebih tinggi** dan **kaskade** (seri) sistem.
+
+> Catatan: Notasi umum di kuliah ini menggunakan variabel waktu $t$ dan transformasi Laplace $s$.
+
+# Sekilas: Model LCCDE Umum
+
+Model LCCDE orde-$N$ ditulis sebagai
+$$
+\sum_{k=0}^{N} a_k \frac{\mathrm{d}^k y(t)}{\mathrm{d} t^k}
+= \sum_{m=0}^{M} b_m \frac{\mathrm{d}^m x(t)}{\mathrm{d} t^m},
+$$
+dengan $a_k, b_m$ konstan, $x(t)$ masukan, $y(t)$ keluaran.
+
+Dengan syarat awal nol (zero initial conditions / ZIC), dalam domain Laplace:
+$$
+Y(s)\left(\sum_{k=0}^{N} a_k s^k\right) = X(s)\left(\sum_{m=0}^{M} b_m s^m\right).
+$$
+Maka **fungsi alih**:
+$$
+H(s) \equiv \frac{Y(s)}{X(s)} = \frac{\sum_{m=0}^{M} b_m s^m}{\sum_{k=0}^{N} a_k s^k}.
+$$
+
+::: callout-tip
+**Konvensi koefisien**: $a_0$ mengalikan $y(t)$, $a_1$ mengalikan $y'(t)$, dst.
+Demikian pula $b_0$ untuk $x(t)$, $b_1$ untuk $x'(t)$, dst.
+:::
+
+## Setup Python
+
+```{python}
+import sympy as sp
+sp.init_printing(use_unicode=True)
+
+t, s = sp.symbols('t s', positive=True, real=True)
+x = sp.Function('x')
+y = sp.Function('y')
+
+def H_of_s(a_coeffs, b_coeffs):
+    """
+    Menghasilkan H(s) = (sum b_m s^m) / (sum a_k s^k).
+    a_coeffs dan b_coeffs adalah list [a0, a1, ..., aN] dan [b0, b1, ..., bM].
+    """
+    A = sp.Add(*[a_coeffs[k]*s**k for k in range(len(a_coeffs))])
+    B = sp.Add(*[b_coeffs[m]*s**m for m in range(len(b_coeffs))])
+    return sp.simplify(B/A)
+
+def impulse_response_from_coeffs(a_coeffs, b_coeffs):
+    Hs = H_of_s(a_coeffs, b_coeffs)
+    h = sp.inverse_laplace_transform(Hs, s, t)
+    return sp.simplify(h)
+
+def step_response_from_coeffs(a_coeffs, b_coeffs):
+    Hs = H_of_s(a_coeffs, b_coeffs)
+    Xs = 1/s  # Laplace dari u(t)
+    Ys = sp.simplify(Hs*Xs)
+    y_step = sp.inverse_laplace_transform(Ys, s, t)
+    return sp.simplify(y_step)
+```
+
+# Orde Pertama: Contoh RC Low-Pass
+
+Persamaan rangkaian RC (normalisasi sederhana):
+$$
+\tau\,\frac{\mathrm{d} y(t)}{\mathrm{d} t} + y(t) = x(t),
+$$
+dengan $\tau = RC$. Koefisien:
+- $a_0 = 1$, $a_1 = \tau$;  
+- $b_0 = 1$.
+
+Maka
+$$
+H(s) = \frac{1}{1 + \tau s}.
+$$
+
+```{python}
+tau = sp.symbols('tau', positive=True, real=True)
+a = [1, tau]   # a0 + a1*s
+b = [1]        # b0
+Hs = H_of_s(a, b)
+Hs
+```
+
+## Respon Impuls $h(t)$
+
+```{python}
+h = impulse_response_from_coeffs(a, b)
+h
+```
+
+Hasil yang diharapkan: $ h(t) = \frac{1}{\tau} e^{-t/\tau} u(t) $.
+
+## Respon Tangga (Step) untuk $x(t) = u(t)$
+
+```{python}
+y_step = step_response_from_coeffs(a, b)
+sp.simplify(y_step)
+```
+
+Hasil yang diharapkan: $ y_{\text{step}}(t) = \bigl(1 - e^{-t/\tau}\bigr)u(t) $.
+
+## Respon Zero-Input vs Zero-State (Opsional)
+
+Zero-input: solusi homogen $ \tau y'(t)+y(t)=0 $.  
+Zero-state: solusi akibat masukan $x(t)$ dengan kondisi awal nol.
+
+```{python}
+C1 = sp.symbols('C1')
+y_h = sp.exp(-t/tau)*C1              # solusi homogen
+y_p = 1 - sp.exp(-t/tau)             # solusi khusus untuk step
+y_total = sp.simplify(y_h + y_p)     # general solution
+y_total
+```
+
+Dengan syarat awal $y(0^-)=0$, maka $C1=0$ dan $y(t)=1-e^{-t/\tau}$.
+
+## Plot Respon Tangga (Numerik)
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+# parameter numerik
+tau_val = 0.5
+tt = np.linspace(0, 3, 400)
+y_step_num = 1 - np.exp(-tt/tau_val)
+
+plt.figure()
+plt.plot(tt, y_step_num, label="Step response (RC)")
+plt.xlabel("t (s)")
+plt.ylabel("y(t)")
+plt.title("Orde 1: Respon Tangga RC (tau=0.5)")
+plt.grid(True)
+plt.legend()
+plt.show()
+```
+
+# Orde Kedua: Contoh RLC / Sistem Massa-Pegas-Redaman
+
+Bentuk kanonik orde-2 yang sering dipakai:
+$$
+\frac{\mathrm{d}^2 y}{\mathrm{d}t^2} + 2\zeta \omega_n \frac{\mathrm{d} y}{\mathrm{d} t} + \omega_n^2 y = \omega_n^2 x(t).
+$$
+Koefisien:
+- $a_0 = \omega_n^2$, $a_1 = 2\zeta\omega_n$, $a_2 = 1$;  
+- $b_0 = \omega_n^2$.  
+Sehingga
+$$
+H(s) = \frac{\omega_n^2}{s^2 + 2\zeta \omega_n s + \omega_n^2}.
+$$
+
+```{python}
+zeta, wn = sp.symbols('zeta wn', positive=True, real=True)
+a2 = [wn**2, 2*zeta*wn, 1]  # a0 + a1*s + a2*s^2
+b2 = [wn**2]                # b0
+Hs2 = H_of_s(a2, b2)
+Hs2
+```
+
+## Respon Impuls dan Respon Tangga
+
+```{python}
+h2 = impulse_response_from_coeffs(a2, b2)
+y2_step = step_response_from_coeffs(a2, b2)
+h2, sp.simplify(y2_step)
+```
+
+Untuk kasus **underdamped** $(0<\zeta<1)$, bentuk waktu biasanya eksponensial teredam sinusoidal.
+
+## Plot Step Response (Underdamped)
+
+```{python}
+# nilai numerik contoh
+zeta_val = 0.2
+wn_val = 5.0
+
+# rumus analitik step response via inverse Laplace bisa rumit;
+# di sini kita gunakan simulasi ODE untuk visual
+from scipy.integrate import solve_ivp
+import numpy as np
+import matplotlib.pyplot as plt
+
+def second_order_step(t, y):
+    y1, y2 = y  # y = y1, y' = y2
+    # y'' = -2*zeta*wn*y' - wn^2*y + wn^2*1 (masukan step = 1)
+    return [y2, -2*zeta_val*wn_val*y2 - wn_val**2*y1 + wn_val**2]
+
+sol = solve_ivp(second_order_step, t_span=(0, 3), y0=[0,0], t_eval=np.linspace(0,3,600))
+plt.figure()
+plt.plot(sol.t, sol.y[0], label="Step response (orde-2)")
+plt.xlabel("t (s)")
+plt.ylabel("y(t)")
+plt.title(f"Orde 2: Step Response (zeta={zeta_val}, wn={wn_val})")
+plt.grid(True)
+plt.legend()
+plt.show()
+```
+
+# Orde Lebih Tinggi (Umum)
+
+Untuk orde-$N$ dengan koefisien $a_0,\dots,a_N$ dan $b_0,\dots,b_M$:
+- **Fungsi alih** langsung dari koefisien via `H_of_s(a,b)`.
+- **Stabilitas BIBO**: sistem stabil jika **semua akar** polinom penyebut $\sum_{k=0}^N a_k s^k$ berada di **setengah bidang kiri** (real part $<0$).
+- **Impulse response** $h(t)$ adalah transformasi Laplace balik dari $H(s)$.
+
+```{python}
+# contoh orde-3: (s+1)(s+2)(s+3) sebagai penyebut, dan pembilang derajat 2
+a3 = sp.Poly((s+1)*(s+2)*(s+3), s).all_coeffs()[::-1]  # [a0,a1,a2,a3]
+b3 = [1, 0.5, 0.1]  # contoh
+Hs3 = H_of_s(a3, b3)
+den_roots = sp.nroots(sp.Add(*[a3[k]*s**k for k in range(len(a3))]))
+Hs3, den_roots
+```
+
+Interpretasi akar penyebut menentukan bentuk $h(t)$ (kombinasi eksponensial/peredaman sinus).
+
+# Kaskade (Seri) Sistem LCCDE
+
+Jika dua sistem LTI dikaskade: $H_{\text{eq}}(s) = H_1(s)\,H_2(s)$.  
+Kaskade dalam ranah waktu merepresentasikan **konvolusi** dua impulse response:
+$$
+h_{\text{eq}}(t) = (h_1 * h_2)(t).
+$$
+
+Contoh: kaskade RC (orde-1) dengan RC lain (orde-1) menghasilkan **orde-2** ekuivalen.
+
+```{python}
+# Dua RC dengan tau1, tau2
+tau1, tau2 = sp.symbols('tau1 tau2', positive=True, real=True)
+H1 = 1/(1 + tau1*s)
+H2 = 1/(1 + tau2*s)
+Heq = sp.simplify(H1*H2)
+h_eq = sp.inverse_laplace_transform(Heq, s, t)
+Heq, h_eq
+```
+
+Jika $\tau_1 \neq \tau_2$, maka
+$$
+H_{\text{eq}}(s) = \frac{1}{(1+\tau_1 s)(1+\tau_2 s)},
+$$
+yang ekuivalen dengan sistem orde-2 dengan dua pole real negatif $-1/\tau_1$ dan $-1/\tau_2$.
+
+## Dari Kaskade ke LCCDE Ekuivalen
+
+Kalikan penyebut untuk memperoleh polinom orde-2, lalu cocokkan ke bentuk
+$$
+a_2 \, y''(t) + a_1 \, y'(t) + a_0\, y(t) = b_0\, x(t).
+$$
+
+```{python}
+# Ekspansi penyebut dan pembilang Heq
+num = sp.expand(sp.together(Heq).as_numer_denom()[0])
+den = sp.expand(sp.together(Heq).as_numer_denom()[1])
+
+sp.factor(num), sp.factor(den), sp.expand(den)
+```
+
+Peroleh koefisien $a_0, a_1, a_2$ dari penyebut (dalam bentuk $a_0 + a_1 s + a_2 s^2$).
+
+# Contoh Lengkap: Menyusun LCCDE dari Fungsi Alih
+
+Misal diketahui
+$$
+H(s) = \frac{b_0 + b_1 s}{a_0 + a_1 s + a_2 s^2}.
+$$
+Dengan ZIC,
+$$
+(a_0 + a_1 s + a_2 s^2)Y(s) = (b_0 + b_1 s)X(s).
+$$
+Kembali ke ranah waktu:
+$$
+a_2\, y''(t) + a_1\, y'(t) + a_0\, y(t) = b_1\, x'(t) + b_0\, x(t).
+$$
+
+```{python}
+a0,a1,a2,b0,b1 = sp.symbols('a0 a1 a2 b0 b1', real=True)
+Hs_sym = (b0 + b1*s)/(a0 + a1*s + a2*s**2)
+sp.simplify(Hs_sym)
+```
+
+# Stabilitas, Kausalitas, dan Minimum-Phase (Ringkas)
+
+- **Stabilitas BIBO**: semua pole $H(s)$ di LHP (real part $<0$).
+- **Kausalitas**: realisasi fisik kausal butuh orde penyebut $\ge$ orde pembilang.
+- **Minimum-phase**: semua **zero** juga di LHP.
+
+```{python}
+# Cek pole/zero untuk contoh orde-2
+num2 = sp.factor(sp.together(Hs2).as_numer_denom()[0])
+den2 = sp.factor(sp.together(Hs2).as_numer_denom()[1])
+sp.nroots(num2), sp.nroots(den2)
+```
+
+# Latihan Singkat
+
+1. Turunkan $H(s)$ untuk sistem: $2\,y'(t) + 4\,y(t) = 3\,x(t)$.  
+2. Untuk $y'' + 6y' + 9y = 9x$:  
+   - Tentukan $H(s)$, pole, dan $h(t)$.  
+   - Apakah sistem stabil BIBO? Jelaskan.  
+3. Dua RC identik ($\tau_1=\tau_2=\tau$) dikaskade. Tulis $H(s)$ dan bandingkan respon tangga dengan satu RC.
+
+```{python}
+# Kerangka jawaban latihan (opsional):
+def poles_zeros(Hs):
+    num = sp.factor(sp.together(Hs).as_numer_denom()[0])
+    den = sp.factor(sp.together(Hs).as_numer_denom()[1])
+    return sp.nroots(num), sp.nroots(den)
+
+# Contoh untuk soal (1)
+a_ex = [4, 2]  # 4 + 2 s
+b_ex = [3]     # 3
+Hs_ex = H_of_s(a_ex, b_ex)
+Hz, Hp = poles_zeros(Hs_ex)
+Hs_ex, Hz, Hp
+```
+
+# Ringkasan
+
+- **LCCDE** adalah bentuk waktu dari sistem **LTI** kontinyu dengan koefisien konstan.  
+- Dengan syarat awal nol, mudah diperoleh **fungsi alih** $H(s)$.  
+- **SymPy** memudahkan: aljabar simbolik $H(s)$, transformasi Laplace balik untuk $h(t)$/respon step, dan analisis pole/zero.  
+- **Orde lebih tinggi** dan **kaskade** tinggal memperbanyak/ mengalikan polinom di $s$.
+
+::: callout-note
+Silakan eksplorasi lebih lanjut: realisasi **state-space**, dekomposisi **partial fraction**, dan hubungan dengan **konvolusi** serta **persamaan beda** (DT) untuk sistem diskrit.
+:::
