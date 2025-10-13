@@ -9,11 +9,12 @@
 
 #show: FRONT-MATTER.with(
   // Document metadata
-  title: (
-    title: "Kisah Hidupmu, Mahakaryamu”
-    subtitle: "Dengan Kekuatan Cerita Personal",
+   title: (
+    title: "Kisah Hidupmu, Mahakaryamu",
+    subtitle: "Kekuatan Cerita Personal",
     sep: " - "
   ),
+  
   authors: (
     (
       given-name: "Armein Z. R.",
@@ -30,7 +31,7 @@
     illustrator: ("Revaz Sopheap", ),
     organizer: "Darko Sergej",
   ),
-  keywords: ("Storytelling", "Pengembangan Diri", "Perencanaan Hidup', "Narasi Personal", "Psikologi Naratif", "Tujuan Hidup", "Transformasi Diri", ),
+  keywords: ("Storytelling", "Pengembangan Diri", "Perencanaan Hidup", "Narasi Personal", "Psikologi Naratif", "Tujuan Hidup", "Transformasi Diri", ),
   date: datetime(year: 2025, month: 9, day: 30), // auto => datetime.today()
   // Document general format
   page-size: (width: 155mm, height: 230mm),
@@ -92,7 +93,10 @@ Selamat membaca dan selamat berkarya.
 
 #show: BODY-MATTER.with(TEXT-SIZE, "Chapter", ship-part-page: false)
 
-#include “kisah.typ”
+#include "kisah.typ"
+
+
+
 //----------------------------------------------------------------------------//
 //                                  APPENDIX                                  //
 //----------------------------------------------------------------------------//
