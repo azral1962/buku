@@ -1,27 +1,4 @@
-Kisah Hidupmu, Mahakaryamu: Panduan Merancang Masa Depan Gemilang dengan
-Kekuatan Cerita Personal
 
-= #strong[Abstrak]
-<abstrak>
-Setiap individu memiliki cerita unik yang membentuk siapa diri mereka.
-Namun, hanya sedikit yang menyadari bahwa mereka bisa menjadi penulis
-sadar dari kisah hidup mereka sendiri. Buku ini mengeksplorasi
-metodologi #emph[storytelling] (bercerita) sebagai alat transformatif
-untuk pengembangan diri dan perencanaan hidup. Dengan memahami
-elemen-elemen naratif fundamental---seperti karakter, konflik, klimaks,
-dan resolusi---pembaca akan dipandu untuk merefleksikan masa lalu,
-memahami masa kini, dan secara proaktif merancang masa depan yang mereka
-inginkan. Pendekatan ini mengubah perencanaan hidup dari sekadar
-rangkaian target menjadi sebuah perjalanan heroik yang bermakna, di mana
-setiap tantangan adalah bagian dari alur cerita menuju pertumbuhan dan
-pemenuhan diri. Buku ini menyajikan kerangka kerja praktis untuk
-mengidentifikasi plot utama dalam hidup, menulis ulang narasi yang
-membatasi, dan membangun sebuah mahakarya kehidupan yang otentik dan
-memuaskan.
-
-#strong[Kata Kunci:] #emph[Storytelling, Pengembangan Diri, Perencanaan
-Hidup, Narasi Personal, Psikologi Naratif, Tujuan Hidup, Transformasi
-Diri.]
 
 = #strong[Kata Pengantar]
 <kata-pengantar>

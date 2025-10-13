@@ -1,0 +1,25 @@
+id: AS848
+place: Bandung
+publisher: GKI Pasteur
+isbn: 123-45-678-90ab-c
+subjects: ["Surat, Penggembalaan"]
+access: ["", ""]
+udc: 10.2025)
+before: |
+  #set align(center)
+  
+  *Editor:*\
+  Anonimus
+  
+  *Tmplate:*\
+  _Minimal Books_ (min-book)
+  
+  *Texto:*\
+  Projek Gutenberg\
+  Archive.org
+  
+  _Surat Pribadi_
+  
+  Untuk menghormati\
+  Para Perempuan di Gereja\
+  dan juga Generasi Muda
